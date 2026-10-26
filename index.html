@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apuração 100% votos</title>
+<style>
+:root{--bg:#060e0a;--card:#0d1b14;--ink:#e8f3ed;--mute:#7f9a8d;--line:#1c3327;--green:#12c26b;--lula:#ff4d5e;--flavio:#ffd21f;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;font-size:18px}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:34px;margin:0;font-weight:800;letter-spacing:-.5px}
+.live{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#03170d;font-weight:800;padding:6px 14px;border-radius:99px}
+.live i{width:10px;height:10px;border-radius:50%;background:#03170d;animation:blink 1.1s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes blink{50%{opacity:.15;transform:scale(.6)}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px}
+.duel{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.cand{flex:1}.cand.r{text-align:right}
+.cand b{display:block;font-size:22px}
+.cand .pct{font-size:clamp(44px,12vw,84px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.cand .n{color:var(--mute);font-variant-numeric:tabular-nums}
+.lula{color:var(--lula)}.flavio{color:var(--flavio)}
+.track{position:relative;height:30px;border-radius:8px;overflow:hidden;background:var(--line);display:flex;margin-top:14px}
+.track.sm{height:14px;margin:0}
+.seg{height:100%;transition:width 1.1s cubic-bezier(.65,0,.35,1)}
+.seg.l{background:var(--lula)}.seg.f{background:var(--flavio)}
+.mid{position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--bg);opacity:.7}
+.sweep{position:absolute;top:0;left:0;height:100%;width:22%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(18, 194, 106, 0),transparent);animation:sweep 2.6s cubic-bezier(.76,0,.24,1) infinite alternate}
+.track.sm .sweep{animation-duration:3.2s}
+@keyframes sweep{from{transform:translateX(-10%)}to{transform:translateX(355%)}}
+.lead{margin-top:10px;color:var(--mute);text-align:center;font-weight:600}
+h2{font-size:22px;margin:26px 0 0}
+.legend{color:var(--mute);margin:4px 0 0;font-size:16px}
+.head,.row{display:grid;grid-template-columns:minmax(120px,1.3fr) 130px minmax(120px,2fr) 130px;gap:12px;align-items:center}
+.head{color:var(--mute);font-weight:700;padding:0 14px;margin-top:12px}
+.head span:nth-child(2){color:var(--lula);text-align:right}.head span:nth-child(4){color:var(--flavio);text-align:right}
+.row{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:8px}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.who img{width:36px;height:27px;object-fit:contain;border-radius:3px;flex:none}
+.fb{width:36px;height:27px;flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;background:var(--line);color:var(--ink);font-weight:800;font-size:15px}
+.who b{font-size:24px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.num{text-align:right;font-weight:800;font-size:24px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ic{font-size:22px;margin-right:6px;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;cursor:help}
+.bar small{display:flex;justify-content:space-between;margin-top:4px;font-weight:700;font-variant-numeric:tabular-nums}
+.empty{color:var(--mute);margin-top:12px}
+@media (max-width:640px){
+ .head{display:none}
+ .row{grid-template-columns:1fr 1fr;gap:10px}
+ .who{grid-column:1/-1}
+ .bar{grid-column:1/-1;order:5}
+ .num.lula{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){.sweep,.live i{animation:none}.seg{transition:none}}
+
+.botoes{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+}
+
+.botoes a{
+  padding: 10px;
+  background-color: #290000;
+  border: 1px solid #fff;
+  text-decoration: none;
+  color: #fff;
+  border-radius: 10px;
+}
+.botoes a:active{
+  background-color: #fff;
+  color: #000;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Apuração (Brasil, sem exterior)</h1>
+    <span class="live"><i></i>AO VIVO</span>
+  </header>
+
+  <section class="panel" aria-label="Total mundial">
+    <div class="duel">
+      <div class="cand"><b class="lula">Lula</b><span class="pct lula" id="pl">0%</span><div class="n" id="nl">0 votos</div></div>
+      <div class="cand r"><b class="flavio">Flávio</b><span class="pct flavio" id="pf">0%</span><div class="n" id="nf">0 votos</div></div>
+    </div>
+    <div class="track"><div class="seg l" id="bl" style="width:50%"></div><div class="seg f" id="bf" style="width:50%"></div><div class="mid"></div><div class="sweep"></div></div>
+    <div class="lead" id="lead"></div>
+  </section>
+
+  <h2>Votos por estados</h2>
+  <div class="botoes">
+    <a href="nor.html">Norte</a>
+    <a href="nde.html">Nordeste</a>
+    <a href="coe.html">Centro-oeste</a>
+    <a href="sul.html">Sul</a>
+    <a href="sud.html">Sudeste</a>
+  </div>
+  <div class="head"><span>Local</span><span>Lula</span><span>Disputa</span><span>Flávio</span></div>
+  <div id="list"></div>
+  <p class="empty" id="empty">Apuração em andamento. Os primeiros resultados aparecem aqui.</p>
+</div>
+
+<script>
+/* ============================================================
+   EDITE AQUI: uma linha por país ou estado
+   ["SIGLA", votos Lula, votos Flávio, "parcial" ou "total"],
+   - País: "PT", "US", "JP"...   Estado brasileiro: "BR-SP", "BR-AL"...
+   - "parcial" = ainda apurando → líder ganha 🕒
+   - "total"   = apuração concluída → vencedor ganha 🏆
+   - Opcional, 5º item: link de imagem da bandeira (se a automática falhar)
+     ex.: ["BR-AL", 3000, 1200, "total", "https://site.com/bandeira.png"]
+   Depois salve e suba o arquivo de novo.
+   ============================================================ */
+var PAISES = [
+  ["BR-AC", 134770, 302807, "parcial", 'file/ac.png'],
+  ["BR-AL", 995459, 735718, "parcial", 'file/al.png'],
+  ["BR-AP", 212503, 212278, "parcial", 'file/ap.png'],
+  ["BR-AM", 1046996, 976764, "parcial", 'file/am.png'],
+  ["BR-BA", 5664771, 2442585, "parcial", 'file/ba.png'],
+  ["BR-CE", 3555263, 1756850, "parcial", 'file/ce.png'],
+  ["BR-DF", 675627, 909616, "parcial", 'file/df.png'],
+  ["BR-ES", 1233194, 850028, "parcial", 'file/es.png'],
+  ["BR-GO", 1188880, 2051888, "parcial", 'file/go.png'],
+  ["BR-MA", 2566301, 1239040, "parcial", 'file/ma.png'],
+  ["BR-MT", 581681, 1298581, "parcial", 'file/mt.png'],
+  ["BR-MS", 516855, 873351, "parcial", 'file/ms.png'],
+  ["BR-MG", 5188936, 5777548, "parcial", 'file/mg.png'],
+  ["BR-PA", 2427237, 2163957, "parcial", 'file/pa.png'],
+  ["BR-PB", 1541127, 831377, "parcial", 'file/pb.png'],
+  ["BR-PR", 2054597, 3945345, "parcial", 'file/pr.png'],
+  ["BR-PE", 3553971, 1738043, "parcial", 'file/pe.png'],
+  ["BR-PI", 1523710, 517028, "parcial", 'file/pi.png'],
+  ["BR-RJ", 3693021, 4966844, "parcial", 'file/rj.png'],
+  ["BR-RN", 1237963, 720493, "parcial", 'file/rn.png'],
+  ["BR-RS", 2294759, 3573783, "parcial", 'file/rs.png'],
+  ["BR-RO", 250667, 652988, "parcial", 'file/ro.png'],
+  ["BR-RR", 74420, 231322, "parcial", 'file/rr.png'],
+  ["BR-SC", 1127168, 3000020, "parcial", 'file/sc.png'],
+  ["BR-SP", 9505413, 12922023, "parcial", 'file/sp.png'],
+  ["BR-SE", 856019, 417839, "parcial", 'file/se.png'],
+  ["BR-TO", 404009, 469321, "parcial", 'file/to.png'],
+];
+/* ============================================================ */
+
+var NAMES={PT:"Portugal",US:"Estados Unidos",GB:"Reino Unido",FR:"França",DE:"Alemanha",IT:"Itália",ES:"Espanha",CH:"Suíça",JP:"Japão",CN:"China",AR:"Argentina",PY:"Paraguai",UY:"Uruguai",CL:"Chile",BO:"Bolívia",PE:"Peru",CO:"Colômbia",VE:"Venezuela",EC:"Equador",MX:"México",CA:"Canadá",AU:"Austrália",NZ:"Nova Zelândia",IE:"Irlanda",NL:"Holanda",BE:"Bélgica",LU:"Luxemburgo",AT:"Áustria",SE:"Suécia",NO:"Noruega",DK:"Dinamarca",FI:"Finlândia",AO:"Angola",MZ:"Moçambique",CV:"Cabo Verde",ZA:"África do Sul",EG:"Egito",MA:"Marrocos",IL:"Israel",AE:"Emirados Árabes",QA:"Catar",SA:"Arábia Saudita",TR:"Turquia",RU:"Rússia",PL:"Polônia",GR:"Grécia",IN:"Índia",KR:"Coreia do Sul",TH:"Tailândia",CU:"Cuba",PA:"Panamá",CR:"Costa Rica",GF:"Guiana Francesa",SR:"Suriname",GY:"Guiana",HT:"Haiti",LB:"Líbano"};
+var UF={AC:"Acre",AL:"Alagoas",AP:"Amapá",AM:"Amazonas",BA:"Bahia",CE:"Ceará",DF:"Distrito Federal",ES:"Espírito Santo",GO:"Goiás",MA:"Maranhão",MT:"Mato Grosso",MS:"Mato Grosso do Sul",MG:"Minas Gerais",PA:"Pará",PB:"Paraíba",PR:"Paraná",PE:"Pernambuco",PI:"Piauí",RJ:"Rio de Janeiro",RN:"Rio Grande do Norte",RS:"Rio Grande do Sul",RO:"Rondônia",RR:"Roraima",SC:"Santa Catarina",SP:"São Paulo",SE:"Sergipe",TO:"Tocantins"};
+Object.keys(UF).forEach(function(k){NAMES["BR-"+k]=UF[k]});
+
+var fmt=new Intl.NumberFormat("pt-BR");
+function pct(a,b){return a+b?a/(a+b)*100:50}
+function p1(n){return n.toFixed(1).replace(".",",")+"%"}
+
+var tl=0,tf=0,list=document.getElementById("list"),bars=[];
+PAISES.forEach(function(p){
+  var code=String(p[0]).toUpperCase(),l=Math.max(0,+p[1]||0),f=Math.max(0,+p[2]||0);
+  var final=String(p[3]||"parcial").toLowerCase()==="total";
+  var src=p[4]||("https://flagcdn.com/w80/"+code.toLowerCase()+".png");
+  tl+=l;tf+=f;
+  var el=document.createElement("div");el.className="row";
+  el.innerHTML='<div class="who"><img alt="" width="36" height="27"><b></b></div>'+
+  '<div class="num lula"></div>'+
+  '<div class="bar"><div class="track sm"><div class="seg l" style="width:50%"></div><div class="seg f" style="width:50%"></div><div class="mid"></div><div class="sweep"></div></div><small><span class="lula"></span><span class="flavio"></span></small></div>'+
+  '<div class="num flavio"></div>';
+  el.querySelector("b").textContent=NAMES[code]||code;
+  var img=el.querySelector("img");
+  img.onerror=function(){
+    var fb=document.createElement("span");fb.className="fb";
+    fb.textContent=code.split("-").pop();
+    this.parentNode.replaceChild(fb,this);
+  };
+  img.src=src;
+  var nums=el.querySelectorAll(".num");
+  nums[0].textContent=fmt.format(l);nums[1].textContent=fmt.format(f);
+  if(l!==f){
+    var ic=document.createElement("span");ic.className="ic";
+    ic.textContent=final?"":"";
+    ic.title=final?"Venceu (apuração concluída)":"Lidera (apuração parcial)";
+    nums[l>f?0:1].insertBefore(ic,nums[l>f?0:1].firstChild);
+  }
+  var sp=el.querySelectorAll(".bar small span");
+  sp[0].textContent=l+f?p1(pct(l,f)):"–";sp[1].textContent=l+f?p1(100-pct(l,f)):"–";
+  bars.push([el,pct(l,f)]);
+  list.appendChild(el);
+});
+document.getElementById("empty").style.display=PAISES.length?"none":"block";
+document.querySelector(".head").style.visibility=PAISES.length?"visible":"hidden";
+
+var p=pct(tl,tf);
+document.getElementById("pl").textContent=tl+tf?p1(p):"0%";
+document.getElementById("pf").textContent=tl+tf?p1(100-p):"0%";
+document.getElementById("nl").textContent=fmt.format(tl)+" votos";
+document.getElementById("nf").textContent=fmt.format(tf)+" votos";
+var t="Total · "+PAISES.length+(PAISES.length===1?" local":" locais");
+t+=tl+tf===0?" · nenhum voto lançado":tl===tf?" · empate técnico":" · "+(tl>tf?"Lula":"Flávio")+" lidera por "+fmt.format(Math.abs(tl-tf))+" votos";
+document.getElementById("lead").textContent=t;
+
+/* animação de entrada das barras */
+requestAnimationFrame(function(){requestAnimationFrame(function(){
+  document.getElementById("bl").style.width=p+"%";
+  document.getElementById("bf").style.width=(100-p)+"%";
+  bars.forEach(function(b){
+    b[0].querySelector(".seg.l").style.width=b[1]+"%";
+    b[0].querySelector(".seg.f").style.width=(100-b[1])+"%";
+  });
+})});
+
+/* recarrega a página a cada 60s pra quem está assistindo ver os números novos */
+setTimeout(function(){location.reload()},60000);
+</script>
+</body>
+</html>
