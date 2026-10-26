@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Apuração 100% votos</title>
 <style>
-:root{--bg:#060e0a;--card:#0d1b14;--ink:#e8f3ed;--mute:#7f9a8d;--line:#1c3327;--green:#12c26b;--lula:#ff4d5e;--flavio:#ffd21f;color-scheme:dark}
+:root{--bg:#060e0a;--card:#0d1b14;--ink:#e8f3ed;--mute:#7f9a8d;--line:#1c3327;--green:#12c26b;--lula:#ff4d5e;--flavio:#ffd21f;--up:#12c26b;--down:#ff3b3b;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;font-size:18px}
 .wrap{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
@@ -44,6 +44,14 @@ h2{font-size:22px;margin:26px 0 0}
 .ic{font-size:22px;margin-right:6px;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;cursor:help}
 .bar small{display:flex;justify-content:space-between;margin-top:4px;font-weight:700;font-variant-numeric:tabular-nums}
 .empty{color:var(--mute);margin-top:12px}
+
+/* comparação com o 1º turno */
+.dif{display:block;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;cursor:help}
+.dif.up{color:var(--up)}
+.dif.down{color:var(--down)}
+.dif.eq{color:var(--mute)}
+.cand .dif{font-size:17px;margin-top:2px}
+
 @media (max-width:640px){
  .head{display:none}
  .row{grid-template-columns:1fr 1fr;gap:10px}
@@ -83,8 +91,8 @@ h2{font-size:22px;margin:26px 0 0}
 
   <section class="panel" aria-label="Total mundial">
     <div class="duel">
-      <div class="cand"><b class="lula">Lula</b><span class="pct lula" id="pl">0%</span><div class="n" id="nl">0 votos</div></div>
-      <div class="cand r"><b class="flavio">Flávio</b><span class="pct flavio" id="pf">0%</span><div class="n" id="nf">0 votos</div></div>
+      <div class="cand"><b class="lula">Lula</b><span class="pct lula" id="pl">0%</span><div class="n" id="nl">0 votos</div><span class="dif" id="dl"></span></div>
+      <div class="cand r"><b class="flavio">Flávio</b><span class="pct flavio" id="pf">0%</span><div class="n" id="nf">0 votos</div><span class="dif" id="df"></span></div>
     </div>
     <div class="track"><div class="seg l" id="bl" style="width:50%"></div><div class="seg f" id="bf" style="width:50%"></div><div class="mid"></div><div class="sweep"></div></div>
     <div class="lead" id="lead"></div>
@@ -105,7 +113,7 @@ h2{font-size:22px;margin:26px 0 0}
 
 <script>
 /* ============================================================
-   EDITE AQUI: uma linha por país ou estado
+   EDITE AQUI: uma linha por país ou estado (2º TURNO)
    ["SIGLA", votos Lula, votos Flávio, "parcial" ou "total"],
    - País: "PT", "US", "JP"...   Estado brasileiro: "BR-SP", "BR-AL"...
    - "parcial" = ainda apurando → líder ganha 🕒
@@ -143,6 +151,40 @@ var PAISES = [
   ["BR-SE", 989041, 433354, "parcial", 'file/se.png'],
   ["BR-TO", 442962, 467916, "parcial", 'file/to.png'],
 ];
+
+/* ============================================================
+   1º TURNO (base da comparação)
+   ["SIGLA", votos Lula, votos Flávio]
+   ============================================================ */
+var TURNO1 = [
+  ["BR-AC", 134770, 302807],
+  ["BR-AL", 995459, 735718],
+  ["BR-AP", 212503, 212278],
+  ["BR-AM", 1046996, 976764],
+  ["BR-BA", 5664771, 2442585],
+  ["BR-CE", 3555263, 1756850],
+  ["BR-DF", 675627, 909616],
+  ["BR-ES", 1233194, 850028],
+  ["BR-GO", 1188880, 2051888],
+  ["BR-MA", 2566301, 1239040],
+  ["BR-MT", 581681, 1298581],
+  ["BR-MS", 516855, 873351],
+  ["BR-MG", 5188936, 5777548],
+  ["BR-PA", 2427237, 2163957],
+  ["BR-PB", 1541127, 831377],
+  ["BR-PR", 2054597, 3945345],
+  ["BR-PE", 3553971, 1738043],
+  ["BR-PI", 1523710, 517028],
+  ["BR-RJ", 3693021, 4966844],
+  ["BR-RN", 1237963, 720493],
+  ["BR-RS", 2294759, 3573783],
+  ["BR-RO", 250667, 652988],
+  ["BR-RR", 74420, 231322],
+  ["BR-SC", 1127168, 3000020],
+  ["BR-SP", 9505413, 12922023],
+  ["BR-SE", 856019, 417839],
+  ["BR-TO", 404009, 469321],
+];
 /* ============================================================ */
 
 var NAMES={PT:"Portugal",US:"Estados Unidos",GB:"Reino Unido",FR:"França",DE:"Alemanha",IT:"Itália",ES:"Espanha",CH:"Suíça",JP:"Japão",CN:"China",AR:"Argentina",PY:"Paraguai",UY:"Uruguai",CL:"Chile",BO:"Bolívia",PE:"Peru",CO:"Colômbia",VE:"Venezuela",EC:"Equador",MX:"México",CA:"Canadá",AU:"Austrália",NZ:"Nova Zelândia",IE:"Irlanda",NL:"Holanda",BE:"Bélgica",LU:"Luxemburgo",AT:"Áustria",SE:"Suécia",NO:"Noruega",DK:"Dinamarca",FI:"Finlândia",AO:"Angola",MZ:"Moçambique",CV:"Cabo Verde",ZA:"África do Sul",EG:"Egito",MA:"Marrocos",IL:"Israel",AE:"Emirados Árabes",QA:"Catar",SA:"Arábia Saudita",TR:"Turquia",RU:"Rússia",PL:"Polônia",GR:"Grécia",IN:"Índia",KR:"Coreia do Sul",TH:"Tailândia",CU:"Cuba",PA:"Panamá",CR:"Costa Rica",GF:"Guiana Francesa",SR:"Suriname",GY:"Guiana",HT:"Haiti",LB:"Líbano"};
@@ -153,7 +195,21 @@ var fmt=new Intl.NumberFormat("pt-BR");
 function pct(a,b){return a+b?a/(a+b)*100:50}
 function p1(n){return n.toFixed(1).replace(".",",")+"%"}
 
-var tl=0,tf=0,list=document.getElementById("list"),bars=[];
+/* monta o mapa do 1º turno por sigla */
+var T1={};
+TURNO1.forEach(function(r){T1[String(r[0]).toUpperCase()]=[+r[1]||0,+r[2]||0]});
+
+/* preenche um elemento com a diferença: + verde, - vermelho */
+function setDif(el,atual,antes){
+  var d=atual-antes;
+  el.classList.remove("up","down","eq");
+  if(d>0){el.textContent="+"+fmt.format(d);el.classList.add("up")}
+  else if(d<0){el.textContent="-"+fmt.format(-d);el.classList.add("down")}
+  else{el.textContent="=";el.classList.add("eq")}
+  el.title="1º turno: "+fmt.format(antes)+" votos";
+}
+
+var tl=0,tf=0,t1l=0,t1f=0,temT1=false,list=document.getElementById("list"),bars=[];
 PAISES.forEach(function(p){
   var code=String(p[0]).toUpperCase(),l=Math.max(0,+p[1]||0),f=Math.max(0,+p[2]||0);
   var final=String(p[3]||"parcial").toLowerCase()==="total";
@@ -180,6 +236,17 @@ PAISES.forEach(function(p){
     ic.title=final?"Venceu (apuração concluída)":"Lidera (apuração parcial)";
     nums[l>f?0:1].insertBefore(ic,nums[l>f?0:1].firstChild);
   }
+  /* comparação com o 1º turno */
+  if(T1[code]){
+    temT1=true;
+    t1l+=T1[code][0];t1f+=T1[code][1];
+    var dl=document.createElement("span");dl.className="dif";
+    var df=document.createElement("span");df.className="dif";
+    setDif(dl,l,T1[code][0]);
+    setDif(df,f,T1[code][1]);
+    nums[0].appendChild(dl);
+    nums[1].appendChild(df);
+  }
   var sp=el.querySelectorAll(".bar small span");
   sp[0].textContent=l+f?p1(pct(l,f)):"–";sp[1].textContent=l+f?p1(100-pct(l,f)):"–";
   bars.push([el,pct(l,f)]);
@@ -193,6 +260,10 @@ document.getElementById("pl").textContent=tl+tf?p1(p):"0%";
 document.getElementById("pf").textContent=tl+tf?p1(100-p):"0%";
 document.getElementById("nl").textContent=fmt.format(tl)+" votos";
 document.getElementById("nf").textContent=fmt.format(tf)+" votos";
+if(temT1){
+  setDif(document.getElementById("dl"),tl,t1l);
+  setDif(document.getElementById("df"),tf,t1f);
+}
 var t="Total · "+PAISES.length+(PAISES.length===1?" local":" locais");
 t+=tl+tf===0?" · nenhum voto lançado":tl===tf?" · empate técnico":" · "+(tl>tf?"Lula":"Flávio")+" lidera por "+fmt.format(Math.abs(tl-tf))+" votos";
 document.getElementById("lead").textContent=t;
